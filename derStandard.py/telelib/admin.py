@@ -122,7 +122,7 @@ def handler(bot, message, chat_id):
         user = user_count()
         subscriber = sub_count()
         reply = 'Total amount of ' + str(user) + ' unique users and ' + str(subscriber) + ' subscribers.\n' + \
-                str((subscriber / user) * 100) + '% of all users are subscribed!\n' \
+                str(int((subscriber / user) * 100)) + '% of all users are subscribed!\n' \
                 '---------------------------------\n' \
                 'Total amount of Newscalls: ' + news_call('get') + '\n' \
                 'Autonews (1): ' + SEND_TIME_1 + '\n' + \

@@ -1,5 +1,6 @@
 import re
 import time
+from telegram import TelegramError
 TIME_LOCK = False
 
 
@@ -67,7 +68,7 @@ def handle_subscriber(chat_id, action):
             print('---------------------------------------------')
             print('User: ' + str(chat_id) + ' unsubscribed from this service!')
             print('---------------------------------------------')
-        else
+        else:
             f.write(subscriber)
     f.close()
 
