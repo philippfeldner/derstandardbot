@@ -151,6 +151,6 @@ def handler(bot, message, chat_id):
                   'settime [1 or 2] [HH:MM] - automessage service \n' + \
                   'running - returns uptime \n' + \
                   'userinfo - returns some statistics\n' + \
-                  'log - sends you the current logfile' \
+                  'log - sends you the current logfile\n' \
                   'broadcast [] - sends the message within [] to everybody!'
         bot.sendMessage(chat_id=chat_id, text=default)

@@ -67,6 +67,8 @@ def handle_subscriber(chat_id, action):
             print('---------------------------------------------')
             print('User: ' + str(chat_id) + ' unsubscribed from this service!')
             print('---------------------------------------------')
+        else
+            f.write(subscriber)
     f.close()
 
 

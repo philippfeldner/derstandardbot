@@ -37,7 +37,7 @@ def get_news(news, topic=''):
         except urllib.error.URLError:
             if (int(time.strftime('%M')) % 5) == 0:
                 print('Connectivity Issues')
-            time.sleep(4)
+            time.sleep(10)
 
     der_standard = source.read().decode('utf-8')
     title = re.findall(re_title, der_standard, re.DOTALL)
@@ -93,7 +93,7 @@ def topic_handler(bot, message, chat_id):
         except urllib.error.URLError:
             if (int(time.strftime('%M')) % 5) == 0:
                 print('Connectivity Issues')
-            time.sleep(4)
+            time.sleep(10)
 
     derstandard = source.read().decode('utf-8')
     regex = r'<h3><a href="(.*?)">(.*?)<'
