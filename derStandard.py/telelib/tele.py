@@ -79,8 +79,15 @@ def send_to_subscriber(bot, news):
     with open('subscriber') as f:
         subscriber = f.readlines()
     for i in range(len(subscriber)):
-        chat_id = int(subscriber[i])
-        bot.sendMessage(chat_id=chat_id, text=news, parse_mode='HTML')
+        try:
+            chat_id = int(subscriber[i])
+            bot.sendMessage(chat_id=chat_id, text=news, parse_mode='HTML')
+        except TelegramError as e:
+            if e.message == 'Unauthorized':
+                handle_subscriber(subscriber[i], 'd')
+                pass
+            else:
+                raise e
     print('---------------------------------------------')
     print(time.strftime('%H:%M'))
     print('Sucessfully send to all subscribers!')
@@ -98,8 +105,15 @@ def broadcast(bot, message):
     with open('user') as f:
         subscriber = f.readlines()
     for i in range(len(subscriber)):
-        chat_id = int(subscriber[i])
-        bot.sendMessage(chat_id=chat_id, text=str(text[0]), parse_mode='HTML')
+        try:
+            chat_id = int(subscriber[i])
+            bot.sendMessage(chat_id=chat_id, text=str(text[0]), parse_mode='HTML')
+        except TelegramError as e:
+            if e.message == 'Unauthorized':
+                handle_subscriber(subscriber[i], 'd')
+                pass
+            else:
+                raise e
     print('---------------------------------------------')
     print(time.strftime('%H:%M'))
     print('Broadcast: [' + str(text[0]) + '] send to everybody!')
