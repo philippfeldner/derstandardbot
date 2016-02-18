@@ -87,6 +87,9 @@ def send_to_subscriber(bot, news):
             if e.message == 'Unauthorized':
                 handle_subscriber(subscriber[i], 'd')
                 pass
+            elif e.message == 'Bad request: Chat not found':
+                handle_subscriber(subscriber[i], 'd')
+                pass
             else:
                 raise e
     print('---------------------------------------------')
