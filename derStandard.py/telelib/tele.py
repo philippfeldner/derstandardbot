@@ -51,11 +51,17 @@ def unique_user(chat_id):
 # This function either adds or removes
 # a user from the list of subscribers
 # saved in the subscriber file.
-def handle_subscriber(chat_id, action):
-    with open('subscriber', 'r') as f:
+def handle_subscriber(chat_id, action, sub_t):
+    regex = r'.*(\d\d:\d\d).*'
+    sub_f = re.findall(regex, sub_t)
+    if sub_f is not None and str(sub_f[0]) in ('06:00', '08:00', '10:00', '12:00',
+                                               '14:00', '16:00', '18:00', '20:00'):
+        sub_t = str(sub_f[0]).replace(':', '')
+    file = 'subscriber/sub_' + sub_t
+    with open(file, 'r') as f:
         subscriber = f.read()
     f.close()
-    with open('subscriber', 'w') as f:
+    with open(file, 'w') as f:
         if action == 'a' and not (str(chat_id) + '\n' in subscriber):
             subscriber += str(chat_id) + '\n'
             f.write(subscriber)
@@ -76,8 +82,9 @@ def handle_subscriber(chat_id, action):
 # sends a news headlines to all subscribers!
 # subscribers are stored in the
 # subscriber plain text file
-def send_to_subscriber(bot, news):
-    with open('subscriber') as f:
+def send_to_subscriber(bot, news, sub_t):
+    file = 'subscriber/sub_' + sub_t
+    with open(file) as f:
         subscriber = f.readlines()
     for i in range(len(subscriber)):
         try:
@@ -87,14 +94,28 @@ def send_to_subscriber(bot, news):
             if e.message == 'Unauthorized':
                 handle_subscriber(subscriber[i], 'd')
                 pass
-            elif e.message == 'Bad request: Chat not found':
+            elif e.message == 'Bad request: chat not found':
                 handle_subscriber(subscriber[i], 'd')
+                error = 'User: ' + subscriber[i] + 'deleted (Bad request!) in: ' + file
+                print('---------------------------------------------')
+                print(error)
+                print('---------------------------------------------')
+                with open('error_log', 'a') as f:
+                    f.write(error)
+                f.close()
                 pass
             else:
-                raise e
+                error = 'User: ' + subscriber[i] + 'causing: ' + e.message
+                print('---------------------------------------------')
+                print(error)
+                print('---------------------------------------------')
+                with open('error_log', 'a') as f:
+                    f.write(error)
+                f.close()
+                pass
     print('---------------------------------------------')
     print(time.strftime('%H:%M'))
-    print('Sucessfully send to all subscribers!')
+    print('Successfully send to all subscribers!')
     print('---------------------------------------------')
 
 
@@ -107,20 +128,18 @@ def broadcast(bot, message):
     if text is []:
         return False
     with open('user') as f:
-        subscriber = f.readlines()
-    for i in range(len(subscriber)):
+        user = f.readlines()
+    for i in range(len(user)):
         try:
-            chat_id = int(subscriber[i])
+            chat_id = int(user[i])
             bot.sendMessage(chat_id=chat_id, text=str(text[0]), parse_mode='HTML')
         except TelegramError as e:
             if e.message == 'Unauthorized':
-                handle_subscriber(subscriber[i], 'd')
                 pass
-            elif e.message == 'Bad request: Chat not found':
-                handle_subscriber(subscriber[i], 'd')
+            elif e.message == 'Bad request: chat not found':
                 pass
             else:
-                raise e
+                pass
     print('---------------------------------------------')
     print(time.strftime('%H:%M'))
     print('Broadcast: [' + str(text[0]) + '] send to everybody!')

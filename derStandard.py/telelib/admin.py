@@ -1,10 +1,7 @@
-import re
 import time
 from telelib import tele
 
 SESSION_START = 'not set'
-SEND_TIME_1 = '08:00'
-SEND_TIME_2 = '13:00'
 
 
 # calling this function without parameters
@@ -26,7 +23,7 @@ def news_call(arg='inc'):
         return value
 
 
-# Calling this functin without
+# Calling this function without
 # parameters returns the start time
 # calling with set resets start time
 def session_start(arg='get'):
@@ -66,10 +63,16 @@ def user_count():
 # the amount of subscribers stored
 # in the subscriber plain text file
 def sub_count():
-    with open('subscriber', 'r') as f:
-        subscriber = f.read()
-    f.close()
-    return subscriber.count('\n')
+    message = ''
+    sub_t = ['0600', '0800', '1000', '1200', '1400', '1600', '1800', '2000']
+    for i in range(len(sub_t)):
+        file = 'subscriber/sub_' + sub_t[i]
+        with open(file, 'r') as f:
+            subscriber = f.read()
+            message += str(subscriber.count('\n')) + ' subscriber @' + sub_t[i] + '\n'
+        f.close()
+
+    return message
 
 
 # This function returns
@@ -100,33 +103,15 @@ def set_time(time_v, val):
 # the admin commands which
 # can only be called by the admin
 def handler(bot, message, chat_id):
-    paramater = message.split()
-    re_time = r'\d\d:\d\d'
-    re_num = r'\d'
-
-    if 'settime' in message:
-        if len(paramater) != 4:
-            bot.sendMessage(chat_id=chat_id, text='Invalid parameter count!')
-            return
-        num = re.findall(re_num, paramater[2])
-        time_v = re.findall(re_time, paramater[3])
-        if num is not None and time_v is not None:
-            if valid_time(time_v[0]) and (int(num[0]) == 1 or int(num[0]) == 2):
-                set_time(time_v[0], num[0])
-                bot.sendMessage(chat_id=chat_id, text='Sucess!')
-            else:
-                bot.sendMessage(chat_id=chat_id, text='Input invalid!')
-                return
-
-    elif 'userinfo' in message:
+    if 'userinfo' in message:
         user = user_count()
         subscriber = sub_count()
-        reply = 'Total amount of ' + str(user) + ' unique users and ' + str(subscriber) + ' subscribers.\n' + \
-                str(int((subscriber / user) * 100)) + '% of all users are subscribed!\n' \
+        reply = 'Total amount of ' + str(user) + ' unique user!\n' + \
+                '---------------------------------\n' + \
+                subscriber + \
                 '---------------------------------\n' \
                 'Total amount of Newscalls: ' + news_call('get') + '\n' \
-                'Autonews (1): ' + SEND_TIME_1 + '\n' + \
-                'Autonews (2): ' + SEND_TIME_2 + '\n'
+
 
         bot.sendMessage(chat_id=chat_id, text=reply)
 
@@ -140,7 +125,7 @@ def handler(bot, message, chat_id):
 
     elif 'broadcast' in message:
         if tele.broadcast(bot, message):
-            bot.sendMessage(chat_id=chat_id, text='Broadcast Sucessfull')
+            bot.sendMessage(chat_id=chat_id, text='Broadcast successful!')
         else:
             bot.sendMessage(chat_id=chat_id, text='Did you use []?')
 
@@ -148,7 +133,6 @@ def handler(bot, message, chat_id):
         default = 'Available admin commands: \n' + \
                   'Format: /admin [command] [param] \n' + \
                   '-------------------------------------\n' \
-                  'settime [1 or 2] [HH:MM] - automessage service \n' + \
                   'running - returns uptime \n' + \
                   'userinfo - returns some statistics\n' + \
                   'log - sends you the current logfile\n' \
