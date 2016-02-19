@@ -14,8 +14,11 @@ ADMIN_ID = 19965814
 # to send the daily news at
 # a specified time to all subscribers
 def sub_service(bot):
-    if tele.time_trigger(admin.send_time(1)) or tele.time_trigger(admin.send_time(2)):
-        tele.send_to_subscriber(bot, generate_news_message('/news'))
+    if tele.time_trigger('06:00') or tele.time_trigger('08:00') or \
+       tele.time_trigger('10:00') or tele.time_trigger('12:00') or \
+       tele.time_trigger('14:00') or tele.time_trigger('16:00') or \
+       tele.time_trigger('18:00') or tele.time_trigger('20:00'):
+            tele.send_to_subscriber(bot, generate_news_message('/news'), time.strftime('%H%M'))
 
 
 # Fetches the news using urllib.request
@@ -54,7 +57,7 @@ def generate_news_message(message):
     mdate = time.strftime('%d.%m.%y')
 
     reply = mdate + ' - ' + mtime + '\n'
-    reply += '<b>Die momentanen Schlagzeilen auf derstandard.at:</b> \n\n'
+    reply += '<b>Die aktuellen Schlagzeilen auf derstandard.at:</b> \n\n'
     link, title = get_news('derstandard')
     for i in range(len(link)):
         link[i] = 'http://derstandard.at' + link[i]
@@ -133,12 +136,32 @@ def der_standard_handler(bot, update_id):
             admin.handler(bot, message, chat_id)
         elif '/start' in message:
             tele.unique_user(chat_id)
-        elif '/subscribe' in message:
-            tele.handle_subscriber(chat_id, 'a')
-            bot.sendMessage(chat_id=chat_id, text='Registrierung Erfolgreich!')
-        elif '/unsubscribe' in message:
-            tele.handle_subscriber(chat_id, 'd')
-            bot.sendMessage(chat_id=chat_id, text='Sie erhalten nun keine täglichen Nachrichten mehr!')
+        elif '/info' in message:
+            reply = '<b>Liebe User!</b>\n\n' + 'Dieser Service basiert auf Python und läuft ' \
+                    'auf einem Raspberry Pi. Ich kann somit also nicht für ständige Laufzeit garantieren!\n\n' + \
+                    'Dies ist ein Einzel/Freizeitprojekt und Ich agiere vollkommen unabhängig von ' + \
+                    '(c) derStandard.at!' + \
+                    ' Ich habe <b>KEINE</b> Rechte auf jegliche Inhalte und verlinke lediglich!\n\n' + \
+                    'Der Quellcode ist frei einsehbar auf:\n' + \
+                    'https://github.com/philippfeldner/TelegramBots\n' + \
+                    'Bei Fragen/Anregungen/Beschwerden/Bugreports:\n' + \
+                    '<b>Telegram</b>: @PhilippFeldner\n' + \
+                    '<b>Email</b>: feldnerphilipp@gmail.com'
+            bot.sendMessage(chat_id=chat_id, text=reply, parse_mode='HTML', disable_web_page_preview=True)
+        elif '/service' in message:
+            time_keyboard = [['✅ 06:00', '❎ 06:00'], ['✅ 08:00', '❎ 08:00'],
+                             ['✅ 10:00', '❎ 10:00'], ['✅ 12:00', '❎ 12:00'],
+                             ['✅ 14:00', '❎ 14:00'], ['✅ 16:00', '❎ 16:00'],
+                             ['✅ 18:00', '❎ 18:00'], ['✅ 20:00', '❎ 20:00'],
+                             ['Fertig!']]
+            reply_markup = telegram.ReplyKeyboardMarkup(time_keyboard)
+            reply = 'Bitte wählen Sie ihre gewünschten Sendezeiten!\n' + \
+                    'Auf Fertig! drücken um die Tastatur zu schließen!'
+            bot.sendMessage(chat_id=chat_id, text=reply, reply_markup=reply_markup)
+        elif '✅' in message:
+            tele.handle_subscriber(chat_id, 'a', message)
+        elif '❎' in message:
+            tele.handle_subscriber(chat_id, 'd', message)
         elif '/news' in message:
             news = generate_news_message(message)
             admin.news_call()
@@ -150,36 +173,48 @@ def der_standard_handler(bot, update_id):
             f.close()
 
             bot.sendMessage(chat_id=chat_id, text=news, parse_mode='HTML')
-        elif '/topic' in message:
-            custom_keyboard = [['International'], ['Inland'], ['Wirtschaft'], ['Web'], ['Sport'],
-                               ['Panorama'], ['Etat'], ['Kultur'], ['Wissenschaft'], ['Gesundheit'], ['Bildung'],
-                               ['Reisen'], ['Lifestyle']]
+        elif message == 'Fertig!':
+            reply_markup = telegram.ReplyKeyboardHide()
+            reply = 'Ihre Einstellungen wurden übernommen!'
+            bot.sendMessage(chat_id=chat_id, text=reply, reply_markup=reply_markup)
+        elif '/thema' in message:
+            custom_keyboard = [[telegram.Emoji.GLOBE_WITH_MERIDIANS + ' International'],
+                               [telegram.Emoji.MOUNTAIN_CABLEWAY + ' Inland'],
+                               [telegram.Emoji.FACTORY + ' Wirtschaft'], [telegram.Emoji.ALIEN_MONSTER + ' Web'],
+                               [telegram.Emoji.SOCCER_BALL + ' Sport'], [telegram.Emoji.NEWSPAPER + ' Panorama'],
+                               [telegram.Emoji.TELEVISION + ' Etat'], [telegram.Emoji.VIOLIN + ' Kultur'],
+                               [telegram.Emoji.MICROSCOPE + ' Wissenschaft'], [telegram.Emoji.SYRINGE + ' Gesundheit'],
+                               [telegram.Emoji.BOOKS + ' Bildung'], [telegram.Emoji.AIRPLANE + ' Reisen'],
+                               [telegram.Emoji.TOP_HAT + ' Lifestyle'], [telegram.Emoji.FAMILY + ' Familie']]
             reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
-            bot.sendMessage(chat_id=chat_id, text='Wählen Sie ihr gewünschtes Thema!', reply_markup=reply_markup)
-        elif message == 'International':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Inland':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Wirtschaft':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Web':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Sport':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Panorama':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Etat':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Kultur':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Wissenschaft':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Gesundheit':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Bildung':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Reisen':
-            topic_handler(bot, message, chat_id)
-        elif message == 'Lifestyle':
-            topic_handler(bot, message, chat_id)
+            reply = 'Wählen Sie ihr gewünschtes Thema!'
+            bot.sendMessage(chat_id=chat_id, text=reply, reply_markup=reply_markup)
+        elif 'International' in message:
+            topic_handler(bot, 'International', chat_id)
+        elif 'Inland' in message:
+            topic_handler(bot, 'Inland', chat_id)
+        elif 'Wirtschaft' in message:
+            topic_handler(bot, 'Wirtschaft', chat_id)
+        elif 'Web' in message:
+            topic_handler(bot, 'Web', chat_id)
+        elif 'Sport' in message:
+            topic_handler(bot, 'Sport', chat_id)
+        elif 'Panorama' in message:
+            topic_handler(bot, 'Panorama', chat_id)
+        elif 'Etat' in message:
+            topic_handler(bot, 'Etat', chat_id)
+        elif 'Kultur' in message:
+            topic_handler(bot, 'Kultur', chat_id)
+        elif 'Wissenschaft' in message:
+            topic_handler(bot, 'Wissenschaft', chat_id)
+        elif 'Gesundheit' in message:
+            topic_handler(bot, 'Gesundheit', chat_id)
+        elif 'Bildung' in message:
+            topic_handler(bot, 'Bildung', chat_id)
+        elif 'Reisen' in message:
+            topic_handler(bot, 'Reisen', chat_id)
+        elif 'Lifestyle' in message:
+            topic_handler(bot, 'Lifestyle', chat_id)
+        elif 'Familie' in message:
+            topic_handler(bot, 'Familie', chat_id)
     return update_id
