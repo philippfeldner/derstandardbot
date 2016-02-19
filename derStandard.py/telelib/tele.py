@@ -123,9 +123,9 @@ def send_to_subscriber(bot, news, sub_t):
 # to every user that is
 # listed in the user file
 def broadcast(bot, message):
-    regex = r'\[(.*?)\]'
-    text = re.findall(regex, message)
-    if text is []:
+    regex = r'<(.*?)>'
+    text = re.findall(regex, message, re.DOTALL)
+    if text is None:
         return False
     with open('user') as f:
         user = f.readlines()

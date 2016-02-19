@@ -127,7 +127,7 @@ def handler(bot, message, chat_id):
         if tele.broadcast(bot, message):
             bot.sendMessage(chat_id=chat_id, text='Broadcast successful!')
         else:
-            bot.sendMessage(chat_id=chat_id, text='Did you use []?')
+            bot.sendMessage(chat_id=chat_id, text='Did you use <>?')
 
     else:
         default = 'Available admin commands: \n' + \
