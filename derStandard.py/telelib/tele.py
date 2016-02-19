@@ -125,7 +125,7 @@ def send_to_subscriber(bot, news, sub_t):
 def broadcast(bot, message):
     regex = r'<(.*?)>'
     text = re.findall(regex, message, re.DOTALL)
-    if text is None:
+    if not text:
         return False
     with open('user') as f:
         user = f.readlines()
