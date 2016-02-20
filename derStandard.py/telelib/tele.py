@@ -11,9 +11,11 @@ def time_trigger(value):
     global TIME_LOCK
     if value == time.strftime('%H:%M') and not TIME_LOCK:
         TIME_LOCK = True
+        print('Locked')
         return True
-    elif int(value[4]) == int(time.strftime('%M')[1:]) + 1 and TIME_LOCK:
+    elif int(value[4]) == int(time.strftime('%M')[1:]) + 5 and TIME_LOCK:
         TIME_LOCK = False
+        print('Unlocked')
         return False
     else:
         return False
