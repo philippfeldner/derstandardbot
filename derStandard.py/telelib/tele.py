@@ -93,10 +93,12 @@ def send_to_subscriber(bot, news, sub_t):
             bot.sendMessage(chat_id=chat_id, text=news, parse_mode='HTML')
         except TelegramError as e:
             if e.message == 'Unauthorized':
-                handle_subscriber(subscriber[i], 'd', sub_t)
+                rm_t = sub_t[:2] + ':' + sub_t[2:]
+                handle_subscriber(subscriber[i], 'd', rm_t)
                 pass
             elif e.message == 'Bad request: chat not found':
-                handle_subscriber(subscriber[i], 'd', sub_t)
+                rm_t = sub_t[:2] + ':' + sub_t[2:]
+                handle_subscriber(subscriber[i], 'd', rm_t)
                 error = 'User: ' + subscriber[i] + 'deleted (Bad request!) in: ' + file
                 print('---------------------------------------------')
                 print(error)
