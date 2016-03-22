@@ -29,9 +29,9 @@ def get_news(news, topic=''):
     re_title = ''
     link = ''
     if news == 'derstandard':
-        link = 'http://derstandard.at' + '/' + topic
-        re_url = r'<h3><a href="(.*?)"'
-        re_title = r'<h3><a href=".*?">(.*?)<'
+        link = 'http://text.derstandard.at' + '/' + topic
+        re_url = r'</font></a><br><a href="(.*?)".*?<strong>.*?</strong>'
+        re_title = r'</font></a><br><a href=".*?".*?<strong>(.*?)</strong>'
 
     while True:
         try:
@@ -91,7 +91,7 @@ def topic_handler(bot, message, chat_id):
 
     while True:
         try:
-            source = urllib.request.urlopen('http://derstandard.at/' + message)
+            source = urllib.request.urlopen('http://text.derstandard.at/' + message)
             break
         except urllib.error.URLError:
             if (int(time.strftime('%M')) % 5) == 0:
@@ -99,7 +99,7 @@ def topic_handler(bot, message, chat_id):
             time.sleep(10)
 
     derstandard = source.read().decode('utf-8')
-    regex = r'<h3><a href="(.*?)">(.*?)<'
+    regex = r'</font></a><br><a href=".*?".*?<strong>(.*?)</strong>'
     match = re.findall(regex, derstandard, re.DOTALL)
 
     for i in range(len(match)):
