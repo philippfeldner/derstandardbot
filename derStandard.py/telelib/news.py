@@ -99,7 +99,7 @@ def topic_handler(bot, message, chat_id):
             time.sleep(10)
 
     derstandard = source.read().decode('utf-8')
-    regex = r'</font></a><br><a href=".*?".*?<strong>(.*?)</strong>'
+    regex = r'</font></a><br><a href="(.*?)".*?<strong>(.*?)</strong>'
     match = re.findall(regex, derstandard, re.DOTALL)
 
     for i in range(len(match)):
